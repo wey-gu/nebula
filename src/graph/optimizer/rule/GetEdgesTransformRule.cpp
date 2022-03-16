@@ -54,6 +54,10 @@ bool GetEdgesTransformRule::match(OptContext *ctx, const MatchedResult &matched)
   if (traverse->stepRange() != nullptr) {
     return false;
   }
+  auto appendVertcies = static_cast<const AppendVertices *>(matched.planNode({0, 0, 0}));
+  if (appendVertcies->trackPrevPath()) {
+    return false;
+  }
   return true;
 }
 
