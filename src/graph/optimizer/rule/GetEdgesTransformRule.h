@@ -25,11 +25,14 @@ namespace opt {
 //  Benefits:
 //   1. Avoid doing Traverse to optimize performance
 //  Quey example:
-//   1. match ()-[e]->() return e limit 3
+//   1. match ()-[e]->() return e
 //
 //  Tranformation:
 //  Before:
-//
+// +---------+---------+
+// |      Project      |
+// +---------+---------+
+//           |
 // +---------+---------+
 // |   AppendVertices  |
 // +---------+---------+
@@ -43,7 +46,10 @@ namespace opt {
 // +---------+---------+
 //
 //  After:
-//
+// +---------+---------+
+// |      Project      |
+// +---------+---------+
+//           |
 // +---------+---------+
 // |   AppendVertices  |
 // +---------+---------+

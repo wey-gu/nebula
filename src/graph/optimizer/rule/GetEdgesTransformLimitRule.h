@@ -18,8 +18,57 @@ class PlanNode;
 
 namespace opt {
 
-// e.g. match ()-[e]->(?) return e limit 1
-// Optimize to get edges directly
+//  Convert [[ScanVertices]] to [[ScanEdges]] in certain cases
+//  Required conditions:
+//   1. Match the pattern
+//  Benefits:
+//   1. Avoid doing Traverse to optimize performance
+//  Quey example:
+//   1. match ()-[e]->() return e limit 1
+//
+//  Tranformation:
+//  Before:
+// +---------+---------+
+// |      Project      |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |       Limit       |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |   AppendVertices  |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |      Traverse     |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |    ScanVertices   |
+// +---------+---------+
+//
+//  After:
+// +---------+---------+
+// |      Project      |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |       Limit       |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |   AppendVertices  |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |      Project      |
+// +---------+---------+
+//           |
+// +---------+---------+
+// |      ScanEdges    |
+// +---------+---------+
+
 class GetEdgesTransformLimitRule final : public OptRule {
  public:
   const Pattern &pattern() const override;
