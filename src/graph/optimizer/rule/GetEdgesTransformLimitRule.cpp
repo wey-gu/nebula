@@ -33,12 +33,13 @@ GetEdgesTransformLimitRule::GetEdgesTransformLimitRule() {
 }
 
 const Pattern &GetEdgesTransformLimitRule::pattern() const {
-  static Pattern pattern =
-      Pattern::create(PlanNode::Kind::kProject,
-              {Pattern::create(PlanNode::Kind::kLimit,
-                  {Pattern::create(PlanNode::Kind::kAppendVertices,
-                                  {Pattern::create(PlanNode::Kind::kTraverse,
-                                                  {Pattern::create(PlanNode::Kind::kScanVertices)})})})});
+  static Pattern pattern = Pattern::create(
+      PlanNode::Kind::kProject,
+      {Pattern::create(
+          PlanNode::Kind::kLimit,
+          {Pattern::create(PlanNode::Kind::kAppendVertices,
+                           {Pattern::create(PlanNode::Kind::kTraverse,
+                                            {Pattern::create(PlanNode::Kind::kScanVertices)})})})});
   return pattern;
 }
 
@@ -85,9 +86,14 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformLimitRule::transform(
 
   auto appendVerticesGroupNode = matched.dependencies.front().dependencies.front().node;
   auto appendVertices = static_cast<const AppendVertices *>(appendVerticesGroupNode->node());
-  auto traverseGroupNode = matched.dependencies.front().dependencies.front().dependencies.front().node;
+  auto traverseGroupNode =
+      matched.dependencies.front().dependencies.front().dependencies.front().node;
   auto traverse = static_cast<const Traverse *>(traverseGroupNode->node());
-  auto scanVerticesGroupNode = matched.dependencies.front().dependencies.front().dependencies.front().dependencies.front().node;
+  auto scanVerticesGroupNode = matched.dependencies.front()
+                                   .dependencies.front()
+                                   .dependencies.front()
+                                   .dependencies.front()
+                                   .node;
   auto qctx = ctx->qctx();
 
   auto newAppendVertices = appendVertices->clone();
@@ -130,8 +136,7 @@ std::string GetEdgesTransformLimitRule::toString() const {
 }
 
 /*static*/ graph::ScanEdges *GetEdgesTransformLimitRule::traverseToScanEdges(
-    const graph::Traverse *traverse,
-    const int64_t limit_count = -1) {
+    const graph::Traverse *traverse, const int64_t limit_count = -1) {
   const auto *edgeProps = traverse->edgeProps();
   if (edgeProps == nullptr) {
     return nullptr;
@@ -160,8 +165,8 @@ std::string GetEdgesTransformLimitRule::toString() const {
 }
 
 /*static*/ graph::Project *GetEdgesTransformLimitRule::projectEdges(graph::QueryContext *qctx,
-                                                               PlanNode *input,
-                                                               const std::string &colName) {
+                                                                    PlanNode *input,
+                                                                    const std::string &colName) {
   auto *yieldColumns = qctx->objPool()->makeAndAdd<YieldColumns>();
   auto *edgeExpr = EdgeExpression::make(qctx->objPool());
   auto *listEdgeExpr = ListExpression::make(qctx->objPool());

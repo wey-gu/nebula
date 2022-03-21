@@ -81,7 +81,8 @@ class GetEdgesTransformLimitRule final : public OptRule {
  private:
   GetEdgesTransformLimitRule();
 
-  static graph::ScanEdges *traverseToScanEdges(const graph::Traverse *traverse, const int64_t limit_count);
+  static graph::ScanEdges *traverseToScanEdges(const graph::Traverse *traverse,
+                                               const int64_t limit_count);
 
   static graph::Project *projectEdges(graph::QueryContext *qctx,
                                       graph::PlanNode *input,
