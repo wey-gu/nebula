@@ -24,7 +24,7 @@ namespace opt {
 //   1. Match the pattern
 //  Benefits:
 //   1. Avoid doing Traverse to optimize performance
-//  Quey example:
+//  Query example:
 //   1. match ()-[e]->() return e limit 1
 //
 //  Tranformation:

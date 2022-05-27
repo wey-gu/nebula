@@ -72,6 +72,7 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformRule::transform(
 
   auto newProject = project->clone();
   auto newProjectGroupNode = OptGroupNode::create(ctx, newProject, projectGroupNode->group());
+  newProject->setOutputVar(project->outputVar());
 
   auto appendVerticesGroupNode = matched.dependencies.front().node;
   auto appendVertices = static_cast<const AppendVertices *>(appendVerticesGroupNode->node());
@@ -85,6 +86,7 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformRule::transform(
   auto newAppendVerticesGroup = OptGroup::create(ctx);
   auto colSize = appendVertices->colNames().size();
   newAppendVertices->setOutputVar(appendVertices->outputVar());
+  newProject->setInputVar(newAppendVertices->outputVar());
   newAppendVertices->setColNames(
       {appendVertices->colNames()[colSize - 2], appendVertices->colNames()[colSize - 1]});
   auto newAppendVerticesGroupNode = newAppendVerticesGroup->makeGroupNode(newAppendVertices);

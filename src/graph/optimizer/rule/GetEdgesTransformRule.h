@@ -20,6 +20,8 @@ class PlanNode;
 namespace opt {
 
 //  Convert [[ScanVertices]] to [[ScanEdges]] in certain cases
+//  Note： match ()-[e]->() return e limit 3
+//        will be handed seperately in GetEdgesTransformLimitRule
 //  Required conditions:
 //   1. Match the pattern
 //  Benefits:

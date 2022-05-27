@@ -74,6 +74,7 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformLimitRule::transform(
 
   auto newProject = project->clone();
   auto newProjectGroupNode = OptGroupNode::create(ctx, newProject, projectGroupNode->group());
+  newProject->setOutputVar(project->outputVar());
 
   auto limitGroupNode = matched.dependencies.front().node;
   auto limit = static_cast<const Limit *>(limitGroupNode->node());
@@ -81,6 +82,8 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformLimitRule::transform(
   auto newLimit = limit->clone();
   auto newLimitGroup = OptGroup::create(ctx);
   auto newLimitGroupNode = newLimitGroup->makeGroupNode(newLimit);
+  newLimit->setOutputVar(limit->outputVar());
+  newProject->setInputVar(newLimit->outputVar());
 
   newProjectGroupNode->dependsOn(newLimitGroup);
 
@@ -99,6 +102,8 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformLimitRule::transform(
   auto newAppendVertices = appendVertices->clone();
   auto newAppendVerticesGroup = OptGroup::create(ctx);
   auto colSize = appendVertices->colNames().size();
+  newAppendVertices->setOutputVar(appendVertices->outputVar());
+  newLimit->setInputVar(appendVertices->outputVar());
   newAppendVertices->setColNames(
       {appendVertices->colNames()[colSize - 2], appendVertices->colNames()[colSize - 1]});
   auto newAppendVerticesGroupNode = newAppendVerticesGroup->makeGroupNode(newAppendVertices);
