@@ -103,7 +103,7 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformLimitRule::transform(
   auto newAppendVerticesGroup = OptGroup::create(ctx);
   auto colSize = appendVertices->colNames().size();
   newAppendVertices->setOutputVar(appendVertices->outputVar());
-  newLimit->setInputVar(appendVertices->outputVar());
+  newLimit->setInputVar(newAppendVertices->outputVar());
   newAppendVertices->setColNames(
       {appendVertices->colNames()[colSize - 2], appendVertices->colNames()[colSize - 1]});
   auto newAppendVerticesGroupNode = newAppendVerticesGroup->makeGroupNode(newAppendVertices);
@@ -119,7 +119,7 @@ StatusOr<OptRule::TransformResult> GetEdgesTransformLimitRule::transform(
 
   auto *newProj = projectEdges(qctx, newScanEdges, traverse->colNames().back());
   newProj->setInputVar(newScanEdges->outputVar());
-  newProj->setOutputVar(traverse->outputVar());
+  newProj->setOutputVar(newAppendVertices->inputVar());
   newProj->setColNames({traverse->colNames().back()});
   auto newProjGroup = OptGroup::create(ctx);
   auto newProjGroupNode = newProjGroup->makeGroupNode(newProj);
