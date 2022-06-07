@@ -3,8 +3,7 @@
  * This source code is licensed under Apache 2.0 License.
  */
 
-#ifndef GRAPH_OPTIMIZER_RULE_GETEDGESTRANSFORMLIMITRULE_H
-#define GRAPH_OPTIMIZER_RULE_GETEDGESTRANSFORMLIMITRULE_H
+#pragma once
 
 #include "graph/optimizer/OptRule.h"
 
@@ -38,6 +37,10 @@ namespace opt {
 // +---------+---------+
 //           |
 // +---------+---------+
+// |   AppendVertices  |
+// +---------+---------+
+//           |
+// +---------+---------+
 // |      Traverse     |
 // +---------+---------+
 //           |
@@ -55,6 +58,10 @@ namespace opt {
 // +---------+---------+
 //           |
 // +---------+---------+
+// |   AppendVertices  |
+// +---------+---------+
+//           |
+// +---------+---------+
 // |      Project      |
 // +---------+---------+
 //           |
@@ -62,7 +69,7 @@ namespace opt {
 // |      ScanEdges    |
 // +---------+---------+
 
-class GetEdgesTransformLimitRule final : public OptRule {
+class GetEdgesTransformAppendVerticesLimitRule final : public OptRule {
  public:
   const Pattern &pattern() const override;
 
@@ -72,10 +79,9 @@ class GetEdgesTransformLimitRule final : public OptRule {
   std::string toString() const override;
 
  private:
-  GetEdgesTransformLimitRule();
+  GetEdgesTransformAppendVerticesLimitRule();
 
-  static graph::ScanEdges *traverseToScanEdges(const graph::Traverse *traverse,
-                                               const int64_t limit_count);
+  static graph::ScanEdges *traverseToScanEdges(const graph::Traverse *traverse, const int64_t limit_count);
 
   static graph::Project *projectEdges(graph::QueryContext *qctx,
                                       graph::PlanNode *input,
@@ -86,4 +92,3 @@ class GetEdgesTransformLimitRule final : public OptRule {
 
 }  // namespace opt
 }  // namespace nebula
-#endif
