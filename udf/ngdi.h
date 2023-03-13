@@ -1,4 +1,10 @@
-// ngdi is a function to take arguments and call remote ngdi-api functions in thriftrpc: "127.0.0.1:9999"
+/* Copyright (c) 2023 vesoft inc. All rights reserved.
+ *
+ * This source code is licensed under Apache 2.0 License.
+ */
+
+// ngdi is a function to take arguments and call remote ngdi-api functions in thriftrpc:
+// "127.0.0.1:9999"
 
 #ifndef UDF_NGDI_H
 #define UDF_NGDI_H
@@ -7,8 +13,7 @@
 
 // Example of a UDF function that calls ngdi-api functions
 
-// > YIELD ngdi("pagerank", ["follow"], ["degree"]) 
-
+// > YIELD ngdi("pagerank", ["follow"], ["degree"])
 
 class ngdi : public GraphFunction {
  public:
