@@ -14,11 +14,11 @@ else
 endif
 
 CXX := g++
-CXX_FLAGS := -c -I ../src/ -I $(3PP_PATH)/include/ -fPIC
+CXX_FLAGS := -std=c++17 -c -I ../src/ -I $(3PP_PATH)/include/ -fPIC
 
 UDF ?= standard_deviation
 
-all: standard_deviation.cpp
+all: $(UDF).cpp
 	$(CXX) $(CXX_FLAGS) $(UDF).cpp -o $(UDF).o
 	$(CXX) -shared -o $(UDF).so $(UDF).o
 

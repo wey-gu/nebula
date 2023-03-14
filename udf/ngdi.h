@@ -30,6 +30,9 @@ class ngdi : public GraphFunction {
   bool isPure() override;
 
   nebula::Value body(const std::vector<std::reference_wrapper<const nebula::Value>> &args) override;
+
+  // call_ngdi_api
+  nebula::Value call_ngdi_api(const std::vector<std::reference_wrapper<const nebula::Value>> &args);
 };
 
 #endif  // UDF_NGDI_H
