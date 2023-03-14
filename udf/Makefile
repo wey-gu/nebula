@@ -14,7 +14,7 @@ else
 endif
 
 CXX := g++
-CXX_FLAGS := -std=c++17 -c -I ../src/ -I $(3PP_PATH)/include/ -fPIC
+CXX_FLAGS := -std=c++17 -c -I ../src/ -I $(3PP_PATH)/include/ -I $(3PP_PATH)/lib -fPIC
 
 UDF ?= standard_deviation
 

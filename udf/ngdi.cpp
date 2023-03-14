@@ -8,12 +8,13 @@
 #include <cmath>
 #include <vector>
 
+#include "../src/common/base/Logging.h"
 #include "../src/common/datatypes/List.h"
 #include "../src/common/datatypes/Map.h"
 #include "../src/common/http/HttpClient.h"
 #include "../src/graph/service/GraphFlags.h"
 
-DEFINE_string(ngdi_host, "http://sparkmaster:9999", "ngdi api host");
+DEFINE_string(ngdi_host, "http://jupyter:9999", "ngdi api host");
 
 extern "C" GraphFunction *create() {
   return new ngdi;
@@ -199,8 +200,8 @@ nebula::Value ngdi::call_ngdi_api(
       return nebula::Value(response);
     } else if (args[1].get().type() == nebula::Value::Type::LIST) {
       // ----------------------------------------------------------
-      // ngdi_algo("pagerank", ["follow"], ["degree"], "parallel") # default algo conf and write
-      // conf ngdi_algo("pagerank", ["follow"], ["degree"], "parallel", {max_iter: 10}, {write_mode:
+      // ngdi("pagerank", ["follow"], ["degree"], "parallel") # default algo conf and write
+      // conf ngdi("pagerank", ["follow"], ["degree"], "parallel", {max_iter: 10}, {write_mode:
       // "insert"})
       // ----------------------------------------------------------
       // if the second arg is a LIST, its read_mode is "scan"
@@ -309,8 +310,8 @@ nebula::Value ngdi::call_ngdi_api(
 
     } else if (args[1].get().type() == nebula::Value::Type::STRING) {
       // ----------------------------------------------------------
-      // ngdi_algo("pagerank", $-.query, "parallel") # default algo conf and write conf
-      // ngdi_algo("pagerank", $-.query, "parallel", {max_iter: 10}, {write_mode: "insert"})
+      // ngdi("pagerank", $-.query, "parallel") # default algo conf and write conf
+      // ngdi("pagerank", $-.query, "parallel", {max_iter: 10}, {write_mode: "insert"})
       // ----------------------------------------------------------
       // if the second arg is a STRING, its read_mode is "query"
       // validate it's not empty
