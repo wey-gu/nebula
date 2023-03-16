@@ -33,6 +33,10 @@ class ngdi : public GraphFunction {
 
   // call_ngdi_api
   nebula::Value call_ngdi_api(const std::vector<std::reference_wrapper<const nebula::Value>> &args);
+  // sendPostRequest
+  std::string sendPostRequest(const std::string &url,
+                              const std::vector<std::string> &headers,
+                              const std::string &body_str);
 };
 
 #endif  // UDF_NGDI_H

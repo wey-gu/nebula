@@ -14,13 +14,14 @@ else
 endif
 
 CXX := g++
-CXX_FLAGS := -std=c++17 -c -I ../src/ -I $(3PP_PATH)/include/ -I $(3PP_PATH)/lib -fPIC
-
+CXX_FLAGS := -std=c++17 -c -I ../src/ -I $(3PP_PATH)/include/ -fPIC -static-libstdc++
+LIBS := -L$(3PP_PATH)/lib -static-libstdc++ -lglog -lgflags -Wl,-rpath=$(3PP_PATH)/lib -lcurl
 UDF ?= standard_deviation
 
 all: $(UDF).cpp
 	$(CXX) $(CXX_FLAGS) $(UDF).cpp -o $(UDF).o
-	$(CXX) -shared -o $(UDF).so $(UDF).o
+	$(CXX) -shared $(UDF).o $(LIBS) -o $(UDF).so
+
 
 clean:
 	rm ./*.o
@@ -30,3 +31,7 @@ clean:
 help:
 	@echo "Usage: make UDF=<udf_name>"
 	@echo "Example: make UDF=standard_deviation"
+
+# Verify linking
+# ldd $(UDF).so
+# nm --defined-only $(UDF).so
