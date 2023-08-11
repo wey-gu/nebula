@@ -136,7 +136,8 @@ std::unordered_map<std::string, std::vector<Value>> FunctionManagerTest::args_ =
     {"json_extract1", {"{\"a\": 1, \"b\": 0.2, \"c\": {\"d\": true}}"}},
     {"json_extract2", {"_"}},
     {"json_extract3", {"{a: 1, \"b\": 0.2}"}},
-    {"json_extract4", {"{\"a\": \"foo\", \"b\": 0.2, \"c\": {\"d\": {\"e\": 0.1}}}"}}};
+    {"json_extract4", {"{\"a\": \"foo\", \"b\": 0.2, \"c\": {\"d\": {\"e\": 0.1}}}"}},
+    {"json_extract5", {"{\"vector\": [1, 2, 3, 4]}"}}};
 
 #define TEST_FUNCTION(expr, ...)                   \
   do {                                             \
@@ -401,10 +402,18 @@ TEST_F(FunctionManagerTest, functionCall) {
     // invalid json string
     TEST_FUNCTION(json_extract, args_["json_extract2"], Value::kNullBadData);
     TEST_FUNCTION(json_extract, args_["json_extract3"], Value::kNullBadData);
-    // when there is nested Map in depth >= 2, the value will be dropped as empty Map()
-    TEST_FUNCTION(json_extract,
-                  args_["json_extract4"],
-                  Value(Map({{"a", Value("foo")}, {"b", Value(0.2)}, {"c", Value(Map())}})));
+    // Nested value will be parsed properly
+    TEST_FUNCTION(
+        json_extract,
+        args_["json_extract4"],
+        Value(Map({{"a", Value(1)}, {"b", Value(0.2)}, {"c", Value(Map({{"d", Value(
+            Map({{"e", Value(0.1)}}))}}))}}))));
+    // Array value will be parsed properly
+    // {"json_extract5", {"{\"vector\": [1, 2, 3, 4]}"}}};
+    TEST_FUNCTION(
+        json_extract,
+        args_["json_extract5"],
+        Value(Map({{"vector", Value(List({Value(1), Value(2), Value(3), Value(4)}))}}))));
   }
   {
     auto result = FunctionManager::get("hash", 1);

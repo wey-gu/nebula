@@ -10,6 +10,8 @@
 
 #include <sstream>
 
+#include "common/datatypes/List.h"
+
 namespace nebula {
 
 std::string Map::toString() const {
@@ -48,42 +50,64 @@ folly::dynamic Map::getMetaData() const {
 // Map constructor to covert from folly::dynamic object
 // Called by function: json_extract()
 
-// TODO(wey-gu) support Datetime, deeper nested Map/Datatypes
+// TODO(wey-gu) support Datetime
 Map::Map(const folly::dynamic& obj) {
   DCHECK(obj.isObject());
   for (auto& kv : obj.items()) {
-    if (kv.second.isString()) {
-      kvs.emplace(kv.first.asString(), Value(kv.second.asString()));
-    } else if (kv.second.isInt()) {
-      kvs.emplace(kv.first.asString(), Value(kv.second.asInt()));
-    } else if (kv.second.isDouble()) {
-      kvs.emplace(kv.first.asString(), Value(kv.second.asDouble()));
-    } else if (kv.second.isBool()) {
-      kvs.emplace(kv.first.asString(), Value(kv.second.asBool()));
-    } else if (kv.second.isNull()) {
-      kvs.emplace(kv.first.asString(), Value());
-    } else if (kv.second.isObject()) {
-      std::unordered_map<std::string, Value> values;
-      for (auto& nkv : kv.second.items()) {
-        if (nkv.second.isString()) {
-          values.emplace(nkv.first.asString(), Value(nkv.second.asString()));
-        } else if (nkv.second.isInt()) {
-          values.emplace(nkv.first.asString(), Value(nkv.second.asInt()));
-        } else if (nkv.second.isDouble()) {
-          values.emplace(nkv.first.asString(), Value(nkv.second.asDouble()));
-        } else if (nkv.second.isBool()) {
-          values.emplace(nkv.first.asString(), Value(nkv.second.asBool()));
-        } else {
-          LOG(WARNING) << "JSON_EXTRACT nested layer 1: Map can be populated only by "
-                          "Bool, Double, Int, String value and null, now trying to parse from: "
-                       << nkv.second.typeName();
+    switch (kv.second.type()) {
+      case folly::dynamic::Type::STRING:
+        kvs.emplace(kv.first.asString(), Value(kv.second.asString()));
+        break;
+      case folly::dynamic::Type::INT64:
+        kvs.emplace(kv.first.asString(), Value(kv.second.asInt()));
+        break;
+      case folly::dynamic::Type::DOUBLE:
+        kvs.emplace(kv.first.asString(), Value(kv.second.asDouble()));
+        break;
+      case folly::dynamic::Type::BOOL:
+        kvs.emplace(kv.first.asString(), Value(kv.second.asBool()));
+        break;
+      case folly::dynamic::Type::NULLT:
+        kvs.emplace(kv.first.asString(), Value());
+        break;
+      case folly::dynamic::Type::OBJECT:
+        kvs.emplace(kv.first.asString(), Value(Map(kv.second)));
+        break;
+      case folly::dynamic::Type::ARRAY: {
+        std::vector<Value> values;
+        for (auto& item : kv.second) {
+          switch (item.type()) {
+            case folly::dynamic::Type::STRING:
+              values.emplace_back(Value(item.asString()));
+              break;
+            case folly::dynamic::Type::INT64:
+              values.emplace_back(Value(item.asInt()));
+              break;
+            case folly::dynamic::Type::DOUBLE:
+              values.emplace_back(Value(item.asDouble()));
+              break;
+            case folly::dynamic::Type::BOOL:
+              values.emplace_back(Value(item.asBool()));
+              break;
+            case folly::dynamic::Type::NULLT:
+              values.emplace_back(Value());
+              break;
+            case folly::dynamic::Type::OBJECT:
+              values.emplace_back(Value(Map(item)));
+              break;
+            case folly::dynamic::Type::ARRAY:
+              // item is an array, we don't support nested array
+              LOG(WARNING) << "JSON_EXTRACT: Nested array is not supported";
+            default:
+              LOG(WARNING) << "JSON_EXTRACT: Unsupported value type: " << item.typeName();
+              break;
+          }
         }
-      }
-      kvs.emplace(kv.first.asString(), Value(Map(std::move(values))));
-    } else {
-      LOG(WARNING) << "JSON_EXTRACT Only Bool, Double, Int, String value, null and Map(depth==1) "
-                      "are supported, now trying to parse from: "
-                   << kv.second.typeName();
+        kvs.emplace(kv.first.asString(), Value(List(std::move(values))));
+      } break;
+      default:
+        LOG(WARNING) << "JSON_EXTRACT: Unsupported value type: " << kv.second.typeName();
+        break;
     }
   }
 }

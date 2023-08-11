@@ -40,20 +40,20 @@ Feature: json_extract Function
       """
     Then a SemanticError should be raised at runtime: `JSON_EXTRACT(3.1415926)' is not a valid expression : Parameter's type error
 
-  Scenario: Test Cases Hitting Limitations
-    # Here nested Map depth is 2, the nested item is omitted:
+  Scenario: Test Nested JSON String
+    # Nested value should be parsed properly
     When executing query:
       """
       YIELD JSON_EXTRACT('{"a": "foo", "b": false, "c": {"d": {"e": 0.1}}}') AS result;
       """
     Then the result should be, in any order:
-      | result                      |
-      | {a: "foo", b: false, c: {}} |
-    # Here List is not yet supported, the encounted value is omitted:
+      | result                                      |
+      | {a: "foo", b: false, c: { d: { e: 0.1 } } } |
+    # Array value is supported
     When executing query:
       """
       YIELD JSON_EXTRACT('{"a": "foo", "b": false, "c": [1, 2, 3]}') AS result;
       """
     Then the result should be, in any order:
-      | result               |
-      | {a: "foo", b: false} |
+      | result                             |
+      | {a: "foo", b: false, c: [1, 2, 3]} |
